@@ -24,7 +24,7 @@ jobs:
         cp "LICENSE" "ModAssistant/bin/Release/LICENSE.ModAssistant.txt"
     - name: Upload Build
       if: startsWith(github.ref, 'refs/tags/') == false
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ModAssistant-${{ github.sha }}
         path: ./ModAssistant/bin/Release/
