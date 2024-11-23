@@ -31,7 +31,7 @@ namespace ModAssistant
             public const string BeatModsURL = "https://beatmods.com";
             public const string BeatModsVersions = "https://versions.beatmods.com/versions.json";
             public const string BeatModsAlias = "https://alias.beatmods.com/aliases.json";
-            public const string WeebCDNAPIURL = "https://api.waifu.pics/sfw/";
+            public const string WeebCDNAPIURL = "https://waifu.pics/api/sfw/";
             public const string BeatModsModsOptions = "mod?status=approved";
             public const string MD5Spacer = "                                 ";
             public static readonly char[] IllegalCharacters = new char[]
