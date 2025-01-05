@@ -290,7 +290,10 @@ namespace ModAssistant
         public static string GetOculusDir()
         {
             string OculusInstall = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64)?.OpenSubKey("SOFTWARE")?.OpenSubKey("Wow6432Node")?.OpenSubKey("Oculus VR, LLC")?.OpenSubKey("Oculus")?.OpenSubKey("Config")?.GetValue("InitialAppLibrary").ToString();
-            if (string.IsNullOrEmpty(OculusInstall)) return null;
+            if (string.IsNullOrEmpty(OculusInstall)) {
+                string OculusInstall = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64)?.OpenSubKey("SOFTWARE")?.OpenSubKey("Wow6432Node")?.OpenSubKey("Oculus VR, LLC")?.OpenSubKey("Oculus")?.GetValue("Base").ToString();
+                if (string.IsNullOrEmpty(OculusInstall)) return null;
+            }
 
             if (!string.IsNullOrEmpty(OculusInstall))
             {
