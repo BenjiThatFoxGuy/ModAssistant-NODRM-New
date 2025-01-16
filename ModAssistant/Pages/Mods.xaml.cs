@@ -24,7 +24,7 @@ namespace ModAssistant.Pages
     {
         public static Mods Instance = new Mods();
 
-        public List<string> DefaultMods = new List<string>() { "SongCore", "ScoreSaber", "BeatSaverDownloader", "BeatSaverVoting", "PlaylistManager", "ModelDownloader" };
+        public List<string> DefaultMods = new List<string> { "SongCore", "WhyIsThereNoLeaderboard", "BeatSaverDownloader", "BeatSaverVoting", "PlaylistManager" };
         public Mod[] ModsList;
         public Mod[] AllModsList;
         public static List<Mod> InstalledMods = new List<Mod>();
@@ -129,6 +129,36 @@ namespace ModAssistant.Pages
 
                 ModsListView.ItemsSource = ModList;
 
+                try
+                {
+                    var manualCategories = new string[] { "Core", "Leaderboards" };
+
+                    ModList.Sort((a, b) =>
+                    {
+                        foreach (var category in manualCategories)
+                        {
+                            if (a.Category == category && b.Category == category) return 0;
+                            if (a.Category == category) return -1;
+                            if (b.Category == category) return 1;
+                        }
+
+                        var categoryCompare = a.Category.CompareTo(b.Category);
+                        if (categoryCompare != 0) return categoryCompare;
+
+                        var aRequired = !a.IsEnabled;
+                        var bRequired = !b.IsEnabled;
+
+                        if (a.ModRequired && !b.ModRequired) return -1;
+                        if (b.ModRequired && !a.ModRequired) return 1;
+
+                        return a.ModName.CompareTo(b.ModName);
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+
                 view = (CollectionView)CollectionViewSource.GetDefaultView(ModsListView.ItemsSource);
                 PropertyGroupDescription groupDescription = new PropertyGroupDescription("Category");
                 view.GroupDescriptions.Add(groupDescription);
@@ -156,15 +186,26 @@ namespace ModAssistant.Pages
             GetBSIPAVersion();
             CheckInstallDir("IPA/Pending/Plugins");
             CheckInstallDir("IPA/Pending/Libs");
+            CheckInstallDir("IPA/Pending/Libs/Native");
             CheckInstallDir("Plugins");
             CheckInstallDir("Libs");
+            CheckInstallDir("Libs/Native");
         }
 
         public async Task GetAllMods()
         {
             var resp = await HttpClient.GetAsync(Utils.Constants.BeatModsAPIUrl + "mod");
             var body = await resp.Content.ReadAsStringAsync();
-            AllModsList = JsonSerializer.Deserialize<Mod[]>(body);
+
+            try
+            {
+                AllModsList = JsonSerializer.Deserialize<Mod[]>(body);
+            }
+            catch (Exception e)
+            {
+                System.Windows.MessageBox.Show($"{FindResource("Mods:LoadFailed")}.\n\n" + e);
+                AllModsList = new Mod[] { };
+            }
         }
 
         private void CheckInstallDir(string directory)
@@ -297,6 +338,7 @@ namespace ModAssistant.Pages
                     ModName = mod.name,
                     ModVersion = mod.version,
                     ModDescription = mod.description.Replace("\r\n", " ").Replace("\n", " "),
+                    ModRequired = mod.required,
                     ModInfo = mod,
                     Category = mod.category
                 };
@@ -520,6 +562,12 @@ namespace ModAssistant.Pages
             {
                 foreach (Mod.Dependency dependency in dependent.dependencies)
                 {
+                    if(dependency.Mod == null)
+                    {
+                        dependent.ListItem.IsEnabled = false;
+                        continue;
+                    }
+
                     if (dependency.Mod.ListItem.IsEnabled)
                     {
                         dependency.Mod.ListItem.PreviousState = dependency.Mod.ListItem.IsSelected;
@@ -594,6 +642,7 @@ namespace ModAssistant.Pages
             public string ModName { get; set; }
             public string ModVersion { get; set; }
             public string ModDescription { get; set; }
+            public bool ModRequired { get; set; }
             public bool PreviousState { get; set; }
 
             public bool IsEnabled { get; set; }

@@ -244,6 +244,7 @@
                 SelectionChanged="ShowOCIWindowComboBox_SelectionChanged">
                     <ComboBoxItem Tag="Yes" Content="{DynamicResource Options:OCIWindowYes}" />
                     <ComboBoxItem Tag="Close" Content="{DynamicResource Options:OCIWindowClose}" />
+                    <ComboBoxItem Tag="Notify" Content="{DynamicResource Options:OCINotify}" />
                     <ComboBoxItem Tag="No" Content="{DynamicResource Options:OCIWindowNo}"/>
                 </ComboBox>
             </StackPanel>
@@ -344,12 +345,6 @@
             Margin="0"
             HorizontalAlignment="Left"
             Orientation="Horizontal">
-                <Button
-                Height="30"
-                Margin="5"
-                Padding="5"
-                Click="OpenLogsDirButton_Click"
-                Content="{DynamicResource Options:OpenLogsButton}" />
                 <Button
                 x:Name="OpenAppData"
                 Height="30"
